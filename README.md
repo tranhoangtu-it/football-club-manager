@@ -1,231 +1,126 @@
-# Football Manager - React + Google Sheets
+# Football Club Manager
 
-A comprehensive web application for managing a small football club using ReactJS and Google Sheets as the database.
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-4-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+A full-featured web application for managing small football clubs. Track members, monitor payments, and run tournaments — all backed by Google Sheets as a lightweight database.
 
 ## Features
 
-- **Member Management**: Add, edit, and manage club members with skill levels and jersey numbers
-- **Payment Dashboard**: Track monthly payments with automatic late payment handling
-- **Tournament Management**: View fixtures and automatically calculated league tables
-- **Real-time Updates**: Live data synchronization with Google Sheets
+- **Member Management** — Add, edit, and remove players with skill levels (A-D) and jersey numbers
+- **Payment Dashboard** — Track monthly dues, mark payments, and auto-detect late fees
+- **Tournament Management** — Create tournaments, schedule matches, and record scores
+- **League Tables** — Auto-calculated standings with points, goal difference, and rankings
+- **Match Fixtures** — View and manage fixtures by tournament and round
+- **Google Sheets Backend** — No dedicated database server required; data lives in a spreadsheet
 
-## Technology Stack
+## Tech Stack
 
-- **Frontend**: ReactJS with Vite
-- **Styling**: Tailwind CSS
-- **State Management**: React Context API
-- **Database**: Google Sheets API
-- **Icons**: Lucide React
-- **Date Handling**: date-fns
+| Layer            | Technology                |
+| ---------------- | ------------------------- |
+| Framework        | React 18                  |
+| Build Tool       | Vite 4                    |
+| Styling          | Tailwind CSS 3            |
+| Routing          | React Router DOM 6        |
+| State Management | React Context API         |
+| Icons            | Lucide React              |
+| Date Utilities   | date-fns                  |
+| Database         | Google Sheets API v4      |
 
-## Google Sheets Setup
-
-### 1. Create Google Sheets Document
-
-Create a new Google Sheets document with the following structure:
-
-#### Sheet 1: `Tournaments` (Mới)
-
-| tournamentId | tournamentName | startDate | endDate | status | description |
-|--------------|----------------|-----------|---------|--------|-------------|
-| T001 | Giải đấu mùa hè 2024 | 2024-06-01 | 2024-08-31 | Active | Giải đấu chính thức |
-| T002 | Giải đấu mùa đông 2024 | 2024-12-01 | 2025-02-28 | Upcoming | Giải đấu mùa đông |
-
-#### Sheet 2: `Members`
-
-| memberId | name | jerseyNumber | skillLevel | joinDate | status |
-|----------|------|--------------|------------|----------|--------|
-| 1 | John Doe | 10 | A | 2024-01-15 | Active |
-| 2 | Jane Smith | 7 | B | 2024-02-01 | Active |
-
-#### Sheet 3: `Payments`
-
-| paymentId | memberId | monthYear | amount | status | paymentDate |
-|-----------|----------|-----------|--------|--------|-------------|
-| 1 | 1 | 1-2024 | 50000 | Paid | 2024-01-15 |
-| 2 | 2 | 1-2024 | 50000 | Unpaid | |
-
-#### Sheet 4: `Teams`
-
-| teamId | teamName | tournamentId | registrationDate | status |
-|--------|----------|--------------|------------------|--------|
-| 1 | Team Alpha | T001 | 2024-05-15 | Active |
-| 2 | Team Beta | T001 | 2024-05-16 | Active |
-| 3 | Team Gamma | T002 | 2024-11-20 | Active |
-
-#### Sheet 5: `Matches`
-
-| matchId | tournamentId | homeTeamId | awayTeamId | homeScore | awayScore | matchDate | round | status |
-|---------|--------------|------------|------------|-----------|-----------|-----------|-------|--------|
-| M001 | T001 | 1 | 2 | 2 | 1 | 2024-06-15 | 1 | Completed |
-| M002 | T001 | 3 | 4 | 0 | 3 | 2024-06-16 | 1 | Completed |
-| M003 | T002 | 3 | 4 | | | 2024-12-15 | 1 | Scheduled |
-
-### 2. Enable Google Sheets API
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable the Google Sheets API
-4. Create credentials (API Key)
-5. Copy the API Key and Spreadsheet ID
-
-### 3. Configure the Application
-
-1. Open `src/services/googleSheetsService.js`
-2. Replace `YOUR_API_KEY_HERE` with your Google Sheets API key
-3. Replace `YOUR_SPREADSHEET_ID_HERE` with your Google Sheets document ID
-
-## Installation & Setup
+## Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
+- Node.js v16 or higher
 - npm or yarn
+- A Google Cloud project with the Sheets API enabled
 
 ### Installation
 
-1. Clone or download the project
-2. Install dependencies:
+```bash
+git clone https://github.com/tranhoangtu-it/football-club-manager.git
+cd football-club-manager
+npm install
+npm run dev
+```
 
-   ```bash
-   npm install
+The app runs at `http://localhost:5173` by default.
+
+### Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Google Sheets Setup
+
+1. **Create a Google Cloud project** at [console.cloud.google.com](https://console.cloud.google.com/) and enable the **Google Sheets API**.
+2. **Generate an API key** under APIs & Services > Credentials.
+3. **Create a spreadsheet** with five sheets named exactly:
+
+   | Sheet Name    | Columns                                                                                       |
+   | ------------- | --------------------------------------------------------------------------------------------- |
+   | `Tournaments` | tournamentId, tournamentName, startDate, endDate, status, description                         |
+   | `Members`     | memberId, name, jerseyNumber, skillLevel, joinDate, status                                    |
+   | `Payments`    | paymentId, memberId, monthYear, amount, status, paymentDate                                   |
+   | `Teams`       | teamId, teamName, tournamentId, registrationDate, status                                      |
+   | `Matches`     | matchId, tournamentId, homeTeamId, awayTeamId, homeScore, awayScore, matchDate, round, status |
+
+4. **Configure credentials** in `src/services/googleSheetsService.js`:
+
+   ```js
+   const GOOGLE_SHEETS_API_KEY = 'your-api-key';
+   const SPREADSHEET_ID = 'your-spreadsheet-id';
    ```
 
-3. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-4. Open your browser and navigate to `http://localhost:3000`
+> **Tip:** Use environment variables or a `.env` file in production to avoid committing secrets.
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── Layout.jsx          # Main layout with navigation
-│   └── MemberForm.jsx      # Member add/edit form
+│   ├── Layout.jsx              # App shell with navigation
+│   └── MemberForm.jsx          # Member add/edit form
 ├── context/
-│   └── AppContext.jsx      # React Context for state management
+│   └── AppContext.jsx           # Global state via React Context
 ├── pages/
-│   ├── Dashboard.jsx       # Main dashboard
-│   ├── MemberList.jsx      # Member management
-│   ├── PaymentDashboard.jsx # Payment tracking
-│   ├── LeagueTable.jsx     # League standings
-│   └── MatchFixtures.jsx   # Match management
+│   ├── Dashboard.jsx            # Overview dashboard
+│   ├── MemberList.jsx           # Member management
+│   ├── PaymentDashboard.jsx     # Payment tracking
+│   ├── TournamentManagement.jsx # Tournament CRUD
+│   ├── MatchFixtures.jsx        # Fixture scheduling
+│   └── LeagueTable.jsx          # Standings table
 ├── services/
-│   └── googleSheetsService.js # Google Sheets API integration
-├── App.jsx                 # Main app component
-├── main.jsx               # Entry point
-└── index.css              # Global styles
+│   └── googleSheetsService.js   # Google Sheets API integration
+├── App.jsx                      # Router and app entry
+├── main.jsx                     # React DOM render
+└── index.css                    # Tailwind imports and global styles
 ```
 
-## Key Features Explained
+## Screenshots
 
-### Member Management
+<!-- Replace the placeholders below with actual screenshots of your running application -->
 
-- Add new members with personal details and skill levels
-- Edit existing member information
-- Delete members from the system
-- Skill levels: A (Professional), B (Advanced), C (Intermediate), D (Beginner)
+| Dashboard | Members | Payments |
+|-----------|---------|----------|
+| _screenshot_ | _screenshot_ | _screenshot_ |
 
-### Payment Dashboard
-
-- View current month payment status
-- Mark payments as paid/unpaid
-- Automatic late payment detection (adds 50,000 to amount)
-- Payment history tracking
-
-### Tournament Management
-
-- View match fixtures for different tournaments
-- Update match scores in real-time
-- Automatic league table calculation
-- Points system: Win=3, Draw=1, Loss=0
-
-### League Table
-
-- Real-time standings based on match results
-- Goal difference calculation
-- Tournament-specific tables
-- Visual indicators for top positions
-
-## API Functions
-
-The `googleSheetsService.js` provides the following functions:
-
-### Members API
-
-- `getAllMembers()` - Get all members
-- `addMember(memberData)` - Add new member
-- `updateMember(memberId, memberData)` - Update member
-- `deleteMember(memberId)` - Delete member
-
-### Payments API
-
-- `getAllPayments()` - Get all payments
-- `getCurrentMonthPayments()` - Get current month payments
-- `addPayment(paymentData)` - Add payment record
-- `updatePaymentStatus(paymentId, status)` - Update payment status
-- `markLatePayments(dueDay)` - Mark unpaid payments as late
-
-### Teams API
-
-- `getAllTeams()` - Get all teams
-- `addTeam(teamData)` - Add new team
-
-### Matches API
-
-- `getAllMatches()` - Get all matches
-- `getMatchesForTournament(tournamentId)` - Get tournament matches
-- `addMatch(matchData)` - Add new match
-- `updateMatchScore(matchId, homeScore, awayScore)` - Update scores
-- `calculateLeagueTable(tournamentId)` - Calculate league standings
-
-## Customization
-
-### Styling
-
-The application uses Tailwind CSS with custom color schemes. You can modify the colors in `tailwind.config.js` and `src/index.css`.
-
-### Data Structure
-
-To modify the Google Sheets structure, update the column names in the service functions and ensure your Google Sheets document matches the expected format.
-
-### Features
-
-Add new features by:
-
-1. Creating new components in the `components/` directory
-2. Adding new pages in the `pages/` directory
-3. Extending the Google Sheets service with new API functions
-4. Updating the navigation in `Layout.jsx`
-
-## Troubleshooting
-
-### Common Issues
-
-1. **API Key Issues**: Ensure your Google Sheets API key is correct and has proper permissions
-2. **Spreadsheet Access**: Make sure the spreadsheet is accessible and the API key has read/write permissions
-3. **CORS Issues**: The Google Sheets API should handle CORS automatically, but ensure your domain is whitelisted if needed
-
-### Error Handling
-
-The application includes comprehensive error handling. Check the browser console for detailed error messages.
+| Tournaments | Fixtures | League Table |
+|-------------|----------|--------------|
+| _screenshot_ | _screenshot_ | _screenshot_ |
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/my-feature`)
+3. Commit your changes (`git commit -m 'feat: add my feature'`)
+4. Push to the branch (`git push origin feature/my-feature`)
+5. Open a Pull Request
 
 ## License
 
-This project is open source and available under the MIT License.
-
-## Support
-
-For support or questions, please create an issue in the repository or contact the development team.
+This project is available under the [MIT License](LICENSE).
